@@ -45,7 +45,7 @@ if __name__ == '__main__':
     cookies = cookie.split("|")
     while (len(cookies) > 0):
         ck = cookies.pop()
-        print(ck)
+        # print(ck)
         start(ck)
 
     
