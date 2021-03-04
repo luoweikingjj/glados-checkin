@@ -5,14 +5,14 @@ sever = os.environ["SERVE"]
 # 填写server酱sckey,不开启server酱则不用填
 sckey = os.environ["SCKEY"]
 #'SCU89402Tf98b7f01ca3394*********************************'
-# 填入glados账号对应cookie
+# 填入glados账号对应cookie 多账号用竖线 | 分隔
 cookie = os.environ["COOKIE"]
 #'__cfduid=d3459ec306384ca67a65170f8e2a5bd************; _ga=GA1.2.766373509.1593*****72; _gid=GA1.2.1338236108.***********72; koa:sess=eyJ1c2VySW*********************aXJlIjoxNjE4OTY5NTI4MzY4LCJfbWF4QWdl****0=; koa:sess.sig=6qG8SyMh*****LBc9yRviaPvI'
 
 
 
 
-def start():
+def start(ck):
     
     url= "https://glados.rocks/api/user/checkin"
     url2= "https://glados.rocks/api/user/status"
@@ -22,17 +22,19 @@ def start():
     payload={
         'token': 'glados_network'
     }
-    checkin = requests.post(url,headers={'cookie': cookie ,'referer': referer,'origin':origin,'user-agent':useragent,'content-type':'application/json;charset=UTF-8'},data=json.dumps(payload))
-    state =  requests.get(url2,headers={'cookie': cookie ,'referer': referer,'origin':origin,'user-agent':useragent})
-   # print(res)
+    checkin = requests.post(url,headers={'cookie': ck ,'referer': referer,'origin':origin,'user-agent':useragent,'content-type':'application/json;charset=UTF-8'},data=json.dumps(payload))
+    state =  requests.get(url2,headers={'cookie': ck ,'referer': referer,'origin':origin,'user-agent':useragent})
+    # print(checkin.json())
+    # print(state.json())
 
     if 'message' in checkin.text:
         mess = checkin.json()['message']
         time = state.json()['data']['leftDays']
+        email = state.json()['data']['email']
         time = time.split('.')[0]
-        #print(time)
+        # print(time)
         if sever == 'on':
-            requests.get('https://sc.ftqq.com/' + sckey + '.send?text='+mess+'，you have '+time+' days left')
+            requests.get('https://sc.ftqq.com/' + sckey + '.send?text='+mess+'，'+email+': have '+time+' days left')
     else:
         requests.get('https://sc.ftqq.com/' + sckey + '.send?text=cookie过期')
 
@@ -40,6 +42,10 @@ def main_handler(event, context):
   return start()
 
 if __name__ == '__main__':
-    start()
+    cookies = cookie.split("|")
+    while (len(cookies) > 0):
+        ck = cookies.pop()
+        print(ck)
+        start(ck)
 
     
